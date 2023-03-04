@@ -38,11 +38,18 @@ def setup_model_parallel() -> Tuple[int, int]:
     return local_rank, world_size
 
 
-def load(ckpt_dir: str, tokenizer_path: str, local_rank: int, world_size: int) -> LLaMA:
+def load(
+    ckpt_dir: str,
+    tokenizer_path: str,
+    local_rank: int,
+    world_size: int,
+    max_seq_len: int,
+    max_batch_size: int,
+) -> LLaMA:
     start_time = time.time()
     checkpoints = sorted(Path(ckpt_dir).glob("*.pth"))
-    assert (
-        world_size == len(checkpoints)
+    assert world_size == len(
+        checkpoints
     ), f"Loading a checkpoint for MP={len(checkpoints)} but world size is {world_size}"
     ckpt_path = checkpoints[local_rank]
     print("Loading")
@@ -108,7 +115,7 @@ def chat():
 def main(ckpt_dir: str = "../llama_model/7B", tokenizer_path: str = "../llama_model/tokenizer.model"):
     local_rank, world_size = setup_model_parallel()
     if local_rank > 0:
-        sys.stdout = open(os.devnull, 'w')
+        sys.stdout = open(os.devnull, "w")
 
     global generator
     generator = load(ckpt_dir, tokenizer_path, local_rank, world_size)
