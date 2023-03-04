@@ -42,9 +42,7 @@ def load(
     ckpt_dir: str,
     tokenizer_path: str,
     local_rank: int,
-    world_size: int,
-    max_seq_len: int,
-    max_batch_size: int,
+    world_size: int
 ) -> LLaMA:
     start_time = time.time()
     checkpoints = sorted(Path(ckpt_dir).glob("*.pth"))
@@ -57,7 +55,7 @@ def load(
     with open(Path(ckpt_dir) / "params.json", "r") as f:
         params = json.loads(f.read())
 
-    model_args: ModelArgs = ModelArgs(max_seq_len=2048, max_batch_size=1, **params)
+    model_args: ModelArgs = ModelArgs(max_seq_len=2248, max_batch_size=1, **params)
     tokenizer = Tokenizer(model_path=tokenizer_path)
     model_args.vocab_size = tokenizer.n_words
     torch.set_default_tensor_type(torch.cuda.HalfTensor)
